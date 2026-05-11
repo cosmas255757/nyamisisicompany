@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loan Portfolio Manager</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        header {
+            background: white;
+            padding: 25px 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        header h1 {
+            color: #333;
+            font-size: 28px;
+            font-weight: 600;
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 15px;
+        }
+
+        .nav-btn {
+            padding: 10px 15px;
+            background: #f0f0f0;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            color: #333;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .nav-btn:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        /* Portfolio Metrics */
+        .portfolio-metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .metric-card {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            border-left: 4px solid #667eea;
+        }
+
+        .metric-icon {
+            font-size: 28px;
+            margin-bottom: 12px;
+        }
+
+        .metric-label {
+            color: #666;
+            font-size: 13px;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        .metric-value {
+            color: #333;
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .metric-trend {
+            font-size: 12px;
+            color: #27ae60;
+        }
+
+        /* Charts Grid */
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .chart-card {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .chart-title {
+            color: #333;
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+        }
+
+        /* Portfolio Breakdown */
+        .breakdown-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .breakdown-card {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .breakdown-title {
+            color: #333;
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .breakdown-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #f5f5f5;
+        }
+
+        .breakdown-item:last-child {
+            border-bottom: none;
+        }
+
+        .item-label {
+            color: #333;
+            font-weight: 500;
+        }
+
+        .item-value {
+            color: #667eea;
+            font-weight: 700;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #f0f0f0;
+            border-radius: 4px;
+            margin: 8px 0;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            border-radius: 4px;
+        }
+
+        /* Table */
+        .table-section {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background: #f8f9fa;
+        }
+
+        th {
+            padding: 15px;
+            text-align: left;
+            color: #333;
+            font-weight: 600;
+            font-size: 13px;
+            text-transform: uppercase;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        td {
+            padding: 15px;
+            border-bottom: 1px solid #f0f0f0;
+            color: #666;
+            font-size: 14px;
+        }
+
+        tr:hover {
+            background: #f9f9f9;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .status-performing {
+            background: #d4f4dd;
+            color: #27ae60;
+        }
+
+        .status-at-risk {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-default {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        /* Risk Matrix */
+        .risk-matrix {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .risk-box {
+            padding: 15px;
+            border-radius: 5px;
+            text-align: center;
+            color: white;
+            font-weight: 600;
+        }
+
+        .risk-low {
+            background: #27ae60;
+        }
+
+        .risk-medium {
+            background: #f39c12;
+        }
+
+        .risk-high {
+            background: #e74c3c;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .chart-container {
+                height: 250px;
+            }
+
+            table {
+                font-size: 12px;
+            }
+
+            th, td {
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body data-page="portfolio">
+    <div class="container">
+        <!-- Header -->
+        <header>
+            <h1>💼 Loan Portfolio Manager</h1>
+            <div class="nav-menu">
+                <a href="admin_dashboard.html" class="nav-btn">Dashboard</a>
+                <a href="application_review_queue.html" class="nav-btn">Applications</a>
+                <a href="user_management.html" class="nav-btn">Users</a>
+                <a href="collections_delinquency.html" class="nav-btn">Collections</a>
+                <a href="reports_analysis.html" class="nav-btn">Reports</a>
+                <a href="settings.html" class="nav-btn">Settings</a>
+            </div>
+        </header>
+
+        <!-- Portfolio Metrics -->
+        <div class="portfolio-metrics">
+            <div class="metric-card">
+                <div class="metric-icon">💰</div>
+                <div class="metric-label">Total Portfolio Value</div>
+                <div id="portfolioValue" class="metric-value">$2,450,500</div>
+                <div class="metric-trend">↑ 12.5% YoY</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-icon">📊</div>
+                <div class="metric-label">Portfolio Health Score</div>
+                <div id="portfolioHealth" class="metric-value">87.5%</div>
+                <div class="metric-trend">↑ 2.3% improvement</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-icon">⚠️</div>
+                <div class="metric-label">At-Risk Loans</div>
+                <div id="atRiskLoans" class="metric-value">$156,200</div>
+                <div class="metric-trend">↓ 3.2% decrease</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-icon">📈</div>
+                <div class="metric-label">Avg Loan Performance</div>
+                <div id="avgPerformance" class="metric-value">91.2%</div>
+                <div class="metric-trend">↑ Stable</div>
+            </div>
+        </div>
+
+        <!-- Charts -->
+        <div class="charts-grid">
+            <!-- Loan Distribution Chart -->
+            <div class="chart-card">
+                <div class="chart-title">📊 Loan Distribution by Amount</div>
+                <div class="chart-container">
+                    <canvas id="distributionChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Portfolio Composition Chart -->
+            <div class="chart-card">
+                <div class="chart-title">🥧 Portfolio Composition</div>
+                <div class="chart-container">
+                    <canvas id="compositionChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Portfolio Breakdown -->
+        <div class="breakdown-section">
+            <!-- Loan Term Breakdown -->
+            <div class="breakdown-card">
+                <div class="breakdown-title">⏱️ Loan Term Breakdown</div>
+                <div class="breakdown-item">
+                    <div>
+                        <div class="item-label">6-Month Loans</div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 20%;"></div>
+                        </div>
+                    </div>
+                    <div class="item-value">$490,100</div>
+                </div>
+                <div class="breakdown-item">
+                    <div>
+                        <div class="item-label">12-Month Loans</div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 35%;"></div>
+                        </div>
+                    </div>
+                    <div class="item-value">$857,675</div>
+                </div>
+                <div class="breakdown-item">
+                    <div>
+                        <div class="item-label">24-Month Loans</div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 30%;"></div>
+                        </div>
+                    </div>
+                    <div class="item-value">$735,150</div>
+                </div>
+                <div class="breakdown-item">
+                    <div>
+                        <div class="item-label">36+ Month Loans</div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 15%;"></div>
+                        </div>
+                    </div>
+                    <div class="item-value">$367,575</div>
+                </div>
+            </div>
+
+            <!-- Interest Rate Distribution -->
+            <div class="breakdown-card">
+                <div class="breakdown-title">📈 Interest Rate Bands</div>
+                <div class="breakdown-item">
+                    <div>
+                        <div class="item-label">6% - 7%</div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 15%;"></div>
+                        </div>
+                    </div>
+                    <div class="item-value">$367,575</div>
+                </div>
+                <div class="breakdown-item">
+                    <div>
+                        <div class="item-label">7% - 8%</div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 35%;"></div>
+                        </div>
+                    </div>
+                    <div class="item-value">$857,675</div>
+                </div>
+                <div class="breakdown-item">
+                    <div>
+                        <div class="item-label">8% - 9%</div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 38%;"></div>
+                        </div>
+                    </div>
+                    <div class="item-value">$931,190</div>
+                </div>
+                <div class="breakdown-item">
+                    <div>
+                        <div class="item-label">9% - 10%</div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 12%;"></div>
+                        </div>
+                    </div>
+                    <div class="item-value">$294,460</div>
+                </div>
+            </div>
+
+            <!-- Risk Assessment -->
+            <div class="breakdown-card">
+                <div class="breakdown-title">⚠️ Risk Assessment</div>
+                <div class="breakdown-item">
+                    <div class="item-label">Low Risk (Performing)</div>
+                    <div class="item-value">82.3%</div>
+                </div>
+                <div class="breakdown-item">
+                    <div class="item-label">Medium Risk (At Risk)</div>
+                    <div class="item-value">14.8%</div>
+                </div>
+                <div class="breakdown-item">
+                    <div class="item-label">High Risk (Default)</div>
+                    <div class="item-value">2.9%</div>
+                </div>
+                <div class="risk-matrix">
+                    <div class="risk-box risk-low">Low<br>2,019</div>
+                    <div class="risk-box risk-medium">Medium<br>184</div>
+                    <div class="risk-box risk-high">High<br>42</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Portfolio Performance Table -->
+        <div class="table-section" style="margin-top: 30px;">
+            <h2 style="margin-bottom: 20px; color: #333;">📋 Portfolio Performance Summary</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Loan ID</th>
+                        <th>Borrower</th>
+                        <th>Loan Amount</th>
+                        <th>Int. Rate</th>
+                        <th>Paid Amount</th>
+                        <th>Remaining</th>
+                        <th>Health</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>#L001245</td>
+                        <td>John Anderson</td>
+                        <td>$5,000</td>
+                        <td>8.5%</td>
+                        <td>$2,500</td>
+                        <td>$2,500</td>
+                        <td>
+                            <div style="background: #f0f0f0; height: 8px; border-radius: 4px; overflow: hidden;">
+                                <div style="background: #27ae60; height: 100%; width: 95%; border-radius: 4px;"></div>
+                            </div>
+                        </td>
+                        <td><span class="status-badge status-performing">Performing</span></td>
+                    </tr>
+                    <tr>
+                        <td>#L001246</td>
+                        <td>Sarah Johnson</td>
+                        <td>$10,000</td>
+                        <td>7.2%</td>
+                        <td>$4,200</td>
+                        <td>$5,800</td>
+                        <td>
+                            <div style="background: #f0f0f0; height: 8px; border-radius: 4px; overflow: hidden;">
+                                <div style="background: #27ae60; height: 100%; width: 98%; border-radius: 4px;"></div>
+                            </div>
+                        </td>
+                        <td><span class="status-badge status-performing">Performing</span></td>
+                    </tr>
+                    <tr>
+                        <td>#L001247</td>
+                        <td>Michael Chen</td>
+                        <td>$8,500</td>
+                        <td>8.0%</td>
+                        <td>$2,500</td>
+                        <td>$6,000</td>
+                        <td>
+                            <div style="background: #f0f0f0; height: 8px; border-radius: 4px; overflow: hidden;">
+                                <div style="background: #f39c12; height: 100%; width: 65%; border-radius: 4px;"></div>
+                            </div>
+                        </td>
+                        <td><span class="status-badge status-at-risk">At Risk</span></td>
+                    </tr>
+                    <tr>
+                        <td>#L001248</td>
+                        <td>Emily Rodriguez</td>
+                        <td>$15,000</td>
+                        <td>6.5%</td>
+                        <td>$15,000</td>
+                        <td>$0</td>
+                        <td>
+                            <div style="background: #f0f0f0; height: 8px; border-radius: 4px; overflow: hidden;">
+                                <div style="background: #27ae60; height: 100%; width: 100%; border-radius: 4px;"></div>
+                            </div>
+                        </td>
+                        <td><span class="status-badge status-performing">Completed</span></td>
+                    </tr>
+                    <tr>
+                        <td>#L001249</td>
+                        <td>David Kim</td>
+                        <td>$7,200</td>
+                        <td>9.0%</td>
+                        <td>$1,500</td>
+                        <td>$5,700</td>
+                        <td>
+                            <div style="background: #f0f0f0; height: 8px; border-radius: 4px; overflow: hidden;">
+                                <div style="background: #e74c3c; height: 100%; width: 35%; border-radius: 4px;"></div>
+                            </div>
+                        </td>
+                        <td><span class="status-badge status-default">Default</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // Loan Distribution Chart
+        const distributionCtx = document.getElementById('distributionChart').getContext('2d');
+        new Chart(distributionCtx, {
+            type: 'bar',
+            data: {
+                labels: ['$0-10K', '$10K-25K', '$25K-50K', '$50K-100K', '$100K+'],
+                datasets: [{
+                    label: 'Number of Loans',
+                    data: [450, 520, 185, 65, 25],
+                    backgroundColor: ['#667eea', '#764ba2', '#f39c12', '#e74c3c', '#27ae60'],
+                    borderRadius: 5
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            font: { size: 12 }
+                        }
+                    }
+                }
+            }
+        });
+
+        // Portfolio Composition Chart
+        const compositionCtx = document.getElementById('compositionChart').getContext('2d');
+        new Chart(compositionCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Performing (88%)', 'At Risk (9%)', 'Default (3%)'],
+                datasets: [{
+                    data: [88, 9, 3],
+                    backgroundColor: ['#27ae60', '#f39c12', '#e74c3c'],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: { font: { size: 12 } }
+                    }
+                }
+            }
+        });
+    </script>
+    <script src="js/app.js" defer></script>
+</body>
+</html>

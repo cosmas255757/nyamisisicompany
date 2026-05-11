@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Management</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        header {
+            background: white;
+            padding: 25px 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        header h1 {
+            color: #333;
+            font-size: 28px;
+            font-weight: 600;
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 15px;
+        }
+
+        .nav-btn {
+            padding: 10px 15px;
+            background: #f0f0f0;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            color: #333;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .nav-btn:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        /* Tool Bar */
+        .toolbar {
+            background: white;
+            padding: 20px 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .search-box {
+            display: flex;
+            gap: 10px;
+            flex: 1;
+            min-width: 250px;
+        }
+
+        .search-box input {
+            flex: 1;
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-primary {
+            padding: 10px 20px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            background: #764ba2;
+        }
+
+        .btn-secondary {
+            padding: 10px 20px;
+            background: #f0f0f0;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-secondary:hover {
+            background: #e0e0e0;
+        }
+
+        /* Stats */
+        .user-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 28px;
+            font-weight: 700;
+            color: #667eea;
+            margin-bottom: 8px;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 13px;
+        }
+
+        /* Table */
+        .table-container {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background: #f8f9fa;
+        }
+
+        th {
+            padding: 15px 20px;
+            text-align: left;
+            color: #333;
+            font-weight: 600;
+            font-size: 13px;
+            text-transform: uppercase;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        td {
+            padding: 15px 20px;
+            border-bottom: 1px solid #f0f0f0;
+            color: #666;
+            font-size: 14px;
+        }
+
+        tr:hover {
+            background: #f9f9f9;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .user-name {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .user-email {
+            font-size: 12px;
+            color: #999;
+        }
+
+        .role-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .role-admin {
+            background: #e8d4f1;
+            color: #764ba2;
+        }
+
+        .role-staff {
+            background: #d4e8f1;
+            color: #0c5460;
+        }
+
+        .role-viewer {
+            background: #f0f0f0;
+            color: #666;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .status-active {
+            background: #d4f4dd;
+            color: #27ae60;
+        }
+
+        .status-inactive {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .action-icons {
+            display: flex;
+            gap: 8px;
+        }
+
+        .icon-btn {
+            width: 32px;
+            height: 32px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .icon-btn-edit {
+            background: #e3f2fd;
+            color: #2196f3;
+        }
+
+        .icon-btn-edit:hover {
+            background: #2196f3;
+            color: white;
+        }
+
+        .icon-btn-delete {
+            background: #ffebee;
+            color: #f44336;
+        }
+
+        .icon-btn-delete:hover {
+            background: #f44336;
+            color: white;
+        }
+
+        .icon-btn-view {
+            background: #f3e5f5;
+            color: #9c27b0;
+        }
+
+        .icon-btn-view:hover {
+            background: #9c27b0;
+            color: white;
+        }
+
+        /* Pagination */
+        .pagination {
+            display: flex;
+            gap: 5px;
+            justify-content: center;
+            margin-top: 20px;
+            padding-bottom: 20px;
+        }
+
+        .pagination button {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            background: white;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+        }
+
+        .pagination button:hover {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .pagination button.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            header {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .toolbar {
+                flex-direction: column;
+            }
+
+            .search-box {
+                width: 100%;
+            }
+
+            .action-buttons {
+                width: 100%;
+            }
+
+            table {
+                font-size: 12px;
+            }
+
+            th, td {
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body data-page="users">
+    <div class="container">
+        <!-- Header -->
+        <header>
+            <h1>👥 User Management</h1>
+            <div class="nav-menu">
+                <a href="admin_dashboard.html" class="nav-btn">Dashboard</a>
+                <a href="application_review_queue.html" class="nav-btn">Applications</a>
+                <a href="loan_portfolio.html" class="nav-btn">Portfolio</a>
+                <a href="collections_delinquency.html" class="nav-btn">Collections</a>
+                <a href="reports_analysis.html" class="nav-btn">Reports</a>
+                <a href="settings.html" class="nav-btn">Settings</a>
+            </div>
+        </header>
+
+        <!-- Toolbar -->
+        <div class="toolbar">
+            <div class="search-box">
+                <input id="userSearch" type="text" placeholder="Search users by name, email, or ID...">
+            </div>
+            <div class="action-buttons">
+                <button id="addUserButton" class="btn-primary">+ Add New User</button>
+                <button id="exportUsersButton" class="btn-secondary">🔽 Export</button>
+            </div>
+        </div>
+
+        <!-- Statistics -->
+        <div class="user-stats">
+            <div class="stat-card">
+                <div class="stat-number">5,420</div>
+                <div class="stat-label">Total Users</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">4,890</div>
+                <div class="stat-label">Active Users</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">530</div>
+                <div class="stat-label">Inactive Users</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">45</div>
+                <div class="stat-label">Staff Members</div>
+            </div>
+        </div>
+
+        <!-- Users Table -->
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>User</th>
+                        <th>Email</th>
+                        <th>Phone</th>
+                        <th>Role</th>
+                        <th>Status</th>
+                        <th>Joined Date</th>
+                        <th>Last Login</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="usersTableBody">
+                    <tr>
+                        <td>
+                            <div class="user-info">
+                                <div class="user-avatar">JA</div>
+                                <div>
+                                    <div class="user-name">John Anderson</div>
+                                    <div class="user-email">ID: #USR001</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>john.anderson@email.com</td>
+                        <td>(555) 123-4567</td>
+                        <td><span class="role-badge role-admin">Admin</span></td>
+                        <td><span class="status-badge status-active">Active</span></td>
+                        <td>2025-01-15</td>
+                        <td>2 hours ago</td>
+                        <td>
+                            <div class="action-icons">
+                                <button class="icon-btn icon-btn-view">👁️</button>
+                                <button class="icon-btn icon-btn-edit">✏️</button>
+                                <button class="icon-btn icon-btn-delete">🗑️</button>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="user-info">
+                                <div class="user-avatar">SJ</div>
+                                <div>
+                                    <div class="user-name">Sarah Johnson</div>
+                                    <div class="user-email">ID: #USR002</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>sarah.johnson@email.com</td>
+                        <td>(555) 234-5678</td>
+                        <td><span class="role-badge role-staff">Staff</span></td>
+                        <td><span class="status-badge status-active">Active</span></td>
+                        <td>2025-02-20</td>
+                        <td>30 minutes ago</td>
+                        <td>
+                            <div class="action-icons">
+                                <button class="icon-btn icon-btn-view">👁️</button>
+                                <button class="icon-btn icon-btn-edit">✏️</button>
+                                <button class="icon-btn icon-btn-delete">🗑️</button>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="user-info">
+                                <div class="user-avatar">MC</div>
+                                <div>
+                                    <div class="user-name">Michael Chen</div>
+                                    <div class="user-email">ID: #USR003</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>michael.chen@email.com</td>
+                        <td>(555) 345-6789</td>
+                        <td><span class="role-badge role-admin">Admin</span></td>
+                        <td><span class="status-badge status-active">Active</span></td>
+                        <td>2025-03-10</td>
+                        <td>5 minutes ago</td>
+                        <td>
+                            <div class="action-icons">
+                                <button class="icon-btn icon-btn-view">👁️</button>
+                                <button class="icon-btn icon-btn-edit">✏️</button>
+                                <button class="icon-btn icon-btn-delete">🗑️</button>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="user-info">
+                                <div class="user-avatar">ER</div>
+                                <div>
+                                    <div class="user-name">Emily Rodriguez</div>
+                                    <div class="user-email">ID: #USR004</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>emily.rodriguez@email.com</td>
+                        <td>(555) 456-7890</td>
+                        <td><span class="role-badge role-staff">Staff</span></td>
+                        <td><span class="status-badge status-inactive">Inactive</span></td>
+                        <td>2024-10-05</td>
+                        <td>15 days ago</td>
+                        <td>
+                            <div class="action-icons">
+                                <button class="icon-btn icon-btn-view">👁️</button>
+                                <button class="icon-btn icon-btn-edit">✏️</button>
+                                <button class="icon-btn icon-btn-delete">🗑️</button>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="user-info">
+                                <div class="user-avatar">DK</div>
+                                <div>
+                                    <div class="user-name">David Kim</div>
+                                    <div class="user-email">ID: #USR005</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>david.kim@email.com</td>
+                        <td>(555) 567-8901</td>
+                        <td><span class="role-badge role-viewer">Viewer</span></td>
+                        <td><span class="status-badge status-active">Active</span></td>
+                        <td>2025-04-08</td>
+                        <td>1 hour ago</td>
+                        <td>
+                            <div class="action-icons">
+                                <button class="icon-btn icon-btn-view">👁️</button>
+                                <button class="icon-btn icon-btn-edit">✏️</button>
+                                <button class="icon-btn icon-btn-delete">🗑️</button>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="user-info">
+                                <div class="user-avatar">LT</div>
+                                <div>
+                                    <div class="user-name">Lisa Thompson</div>
+                                    <div class="user-email">ID: #USR006</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>lisa.thompson@email.com</td>
+                        <td>(555) 678-9012</td>
+                        <td><span class="role-badge role-staff">Staff</span></td>
+                        <td><span class="status-badge status-active">Active</span></td>
+                        <td>2025-01-22</td>
+                        <td>20 minutes ago</td>
+                        <td>
+                            <div class="action-icons">
+                                <button class="icon-btn icon-btn-view">👁️</button>
+                                <button class="icon-btn icon-btn-edit">✏️</button>
+                                <button class="icon-btn icon-btn-delete">🗑️</button>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="user-info">
+                                <div class="user-avatar">RW</div>
+                                <div>
+                                    <div class="user-name">Robert Wilson</div>
+                                    <div class="user-email">ID: #USR007</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>robert.wilson@email.com</td>
+                        <td>(555) 789-0123</td>
+                        <td><span class="role-badge role-viewer">Viewer</span></td>
+                        <td><span class="status-badge status-active">Active</span></td>
+                        <td>2025-02-14</td>
+                        <td>45 minutes ago</td>
+                        <td>
+                            <div class="action-icons">
+                                <button class="icon-btn icon-btn-view">👁️</button>
+                                <button class="icon-btn icon-btn-edit">✏️</button>
+                                <button class="icon-btn icon-btn-delete">🗑️</button>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="user-info">
+                                <div class="user-avatar">MB</div>
+                                <div>
+                                    <div class="user-name">Maria Brown</div>
+                                    <div class="user-email">ID: #USR008</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>maria.brown@email.com</td>
+                        <td>(555) 890-1234</td>
+                        <td><span class="role-badge role-staff">Staff</span></td>
+                        <td><span class="status-badge status-inactive">Inactive</span></td>
+                        <td>2024-12-01</td>
+                        <td>3 months ago</td>
+                        <td>
+                            <div class="action-icons">
+                                <button class="icon-btn icon-btn-view">👁️</button>
+                                <button class="icon-btn icon-btn-edit">✏️</button>
+                                <button class="icon-btn icon-btn-delete">🗑️</button>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <!-- Pagination -->
+            <div class="pagination">
+                <button>← Prev</button>
+                <button class="active">1</button>
+                <button>2</button>
+                <button>3</button>
+                <button>4</button>
+                <button>5</button>
+                <button>Next →</button>
+            </div>
+        </div>
+    </div>
+    <script src="js/app.js" defer></script>
+</body>
+</html>

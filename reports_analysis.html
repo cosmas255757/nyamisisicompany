@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reports & Analysis</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        header {
+            background: white;
+            padding: 25px 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        header h1 {
+            color: #333;
+            font-size: 28px;
+            font-weight: 600;
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 15px;
+        }
+
+        .nav-btn {
+            padding: 10px 15px;
+            background: #f0f0f0;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            color: #333;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .nav-btn:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        /* Toolbar */
+        .toolbar {
+            background: white;
+            padding: 20px 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .filter-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .filter-group label {
+            color: #333;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .filter-group select {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
+        .btn-generate {
+            padding: 10px 20px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background 0.3s ease;
+        }
+
+        .btn-generate:hover {
+            background: #764ba2;
+        }
+
+        .btn-download {
+            padding: 10px 20px;
+            background: #f0f0f0;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        /* Reports Grid */
+        .reports-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .report-card {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            border-top: 4px solid #667eea;
+            transition: transform 0.3s ease;
+        }
+
+        .report-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .report-icon {
+            font-size: 32px;
+            margin-bottom: 12px;
+        }
+
+        .report-title {
+            color: #333;
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .report-desc {
+            color: #666;
+            font-size: 13px;
+            margin-bottom: 12px;
+        }
+
+        .report-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .report-btn {
+            flex: 1;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            background: white;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            color: #667eea;
+            transition: all 0.3s ease;
+        }
+
+        .report-btn:hover {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        /* Analysis Cards */
+        .analysis-section {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+
+        .section-title {
+            color: #333;
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 25px;
+        }
+
+        .analysis-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 25px;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+        }
+
+        /* Metrics Display */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .metric-box {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .metric-title {
+            color: #666;
+            font-size: 13px;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+        }
+
+        .metric-number {
+            font-size: 28px;
+            font-weight: 700;
+            color: #667eea;
+            margin-bottom: 8px;
+        }
+
+        .metric-description {
+            font-size: 12px;
+            color: #999;
+        }
+
+        /* Table */
+        .table-section {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background: #f8f9fa;
+        }
+
+        th {
+            padding: 15px;
+            text-align: left;
+            color: #333;
+            font-weight: 600;
+            font-size: 13px;
+            text-transform: uppercase;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        td {
+            padding: 15px;
+            border-bottom: 1px solid #f0f0f0;
+            color: #666;
+            font-size: 14px;
+        }
+
+        tr:hover {
+            background: #f9f9f9;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .toolbar {
+                flex-direction: column;
+            }
+
+            .analysis-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .chart-container {
+                height: 250px;
+            }
+
+            table {
+                font-size: 12px;
+            }
+
+            th, td {
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body data-page="reports">
+    <div class="container">
+        <!-- Header -->
+        <header>
+            <h1>📊 Reports & Analysis</h1>
+            <div class="nav-menu">
+                <a href="admin_dashboard.html" class="nav-btn">Dashboard</a>
+                <a href="application_review_queue.html" class="nav-btn">Applications</a>
+                <a href="user_management.html" class="nav-btn">Users</a>
+                <a href="loan_portfolio.html" class="nav-btn">Portfolio</a>
+                <a href="collections_delinquency.html" class="nav-btn">Collections</a>
+                <a href="settings.html" class="nav-btn">Settings</a>
+            </div>
+        </header>
+
+        <!-- Toolbar -->
+        <div class="toolbar">
+            <div style="display: flex; gap: 15px; flex-wrap: wrap; align-items: center;">
+                <div class="filter-group">
+                    <label>Date Range:</label>
+                    <select id="reportRange">
+                        <option value="7">Last 7 Days</option>
+                        <option value="30">Last 30 Days</option>
+                        <option value="90">Last 3 Months</option>
+                        <option value="365">Last Year</option>
+                        <option value="custom">Custom Range</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Report Type:</label>
+                    <select id="reportType">
+                        <option value="all">All Reports</option>
+                        <option value="performance">Loan Performance</option>
+                        <option value="collections">Collections</option>
+                        <option value="portfolio">Portfolio Analysis</option>
+                    </select>
+                </div>
+            </div>
+            <div style="display: flex; gap: 10px;">
+                <button id="generateReportBtn" class="btn-generate">Generate Report</button>
+                <button id="downloadReportBtn" class="btn-download">📥 Download</button>
+            </div>
+        </div>
+
+        <!-- Key Metrics -->
+        <div class="metrics-grid">
+            <div class="metric-box">
+                <div class="metric-title">Total Revenue (YTD)</div>
+                <div class="metric-number">$1,024,500</div>
+                <div class="metric-description">Interest collected from all loans</div>
+            </div>
+            <div class="metric-box">
+                <div class="metric-title">Portfolio Growth</div>
+                <div class="metric-number">+18.5%</div>
+                <div class="metric-description">Year-over-year growth rate</div>
+            </div>
+            <div class="metric-box">
+                <div class="metric-title">Risk-Adjusted Return</div>
+                <div class="metric-number">8.4%</div>
+                <div class="metric-description">Average annual return</div>
+            </div>
+            <div class="metric-box">
+                <div class="metric-title">Default Rate</div>
+                <div class="metric-number">2.1%</div>
+                <div class="metric-description">Below industry average of 3.2%</div>
+            </div>
+        </div>
+
+        <!-- Available Reports -->
+        <div class="reports-grid">
+            <div class="report-card">
+                <div class="report-icon">📈</div>
+                <div class="report-title">Monthly Performance Report</div>
+                <div class="report-desc">Detailed monthly loan origination, disbursement, and collection metrics</div>
+                <div class="report-actions">
+                    <button class="report-btn">View</button>
+                    <button class="report-btn">Download</button>
+                </div>
+            </div>
+
+            <div class="report-card" style="border-top-color: #f39c12;">
+                <div class="report-icon">⚠️</div>
+                <div class="report-title">Risk Assessment Report</div>
+                <div class="report-desc">Comprehensive analysis of loan portfolio risk exposure and stress testing</div>
+                <div class="report-actions">
+                    <button class="report-btn">View</button>
+                    <button class="report-btn">Download</button>
+                </div>
+            </div>
+
+            <div class="report-card" style="border-top-color: #27ae60;">
+                <div class="report-icon">💵</div>
+                <div class="report-title">Collections Report</div>
+                <div class="report-desc">Payment performance, delinquency tracking, and collection activities</div>
+                <div class="report-actions">
+                    <button class="report-btn">View</button>
+                    <button class="report-btn">Download</button>
+                </div>
+            </div>
+
+            <div class="report-card" style="border-top-color: #e74c3c;">
+                <div class="report-icon">📋</div>
+                <div class="report-title">Portfolio Health Report</div>
+                <div class="report-desc">Loan allocation, diversification, and concentration analysis</div>
+                <div class="report-actions">
+                    <button class="report-btn">View</button>
+                    <button class="report-btn">Download</button>
+                </div>
+            </div>
+
+            <div class="report-card" style="border-top-color: #3498db;">
+                <div class="report-icon">👥</div>
+                <div class="report-title">Customer Analytics Report</div>
+                <div class="report-desc">Borrower demographics, satisfaction scores, and lifetime value</div>
+                <div class="report-actions">
+                    <button class="report-btn">View</button>
+                    <button class="report-btn">Download</button>
+                </div>
+            </div>
+
+            <div class="report-card" style="border-top-color: #9b59b6;">
+                <div class="report-icon">💰</div>
+                <div class="report-title">Financial Summary Report</div>
+                <div class="report-desc">Profitability analysis, expense tracking, and financial ratios</div>
+                <div class="report-actions">
+                    <button class="report-btn">View</button>
+                    <button class="report-btn">Download</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Analysis Section -->
+        <div class="analysis-section">
+            <div class="section-title">📊 Performance Analysis</div>
+            <div class="analysis-grid">
+                <!-- Loan Approval Trend -->
+                <div>
+                    <div class="chart-container">
+                        <canvas id="approvalChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Revenue by Loan Type -->
+                <div>
+                    <div class="chart-container">
+                        <canvas id="revenueChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Portfolio Quality -->
+                <div>
+                    <div class="chart-container">
+                        <canvas id="qualityChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Customer Satisfaction -->
+                <div>
+                    <div class="chart-container">
+                        <canvas id="satisfactionChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Key Insights Table -->
+        <div class="table-section">
+            <h2 style="margin-bottom: 20px; color: #333;">🎯 Key Insights & Recommendations</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Category</th>
+                        <th>Finding</th>
+                        <th>Impact</th>
+                        <th>Recommendation</th>
+                        <th>Priority</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Loan Growth</td>
+                        <td>Portfolio grew 18.5% YoY, exceeding targets</td>
+                        <td>Positive</td>
+                        <td>Continue current acquisition strategy</td>
+                        <td><span style="background: #d4f4dd; padding: 4px 8px; border-radius: 3px; color: #27ae60;">Low</span></td>
+                    </tr>
+                    <tr>
+                        <td>Delinquency</td>
+                        <td>30+ day delinquencies up 12% month-over-month</td>
+                        <td>Concerning</td>
+                        <td>Enhance collection efforts, review underwriting criteria</td>
+                        <td><span style="background: #fff3cd; padding: 4px 8px; border-radius: 3px; color: #856404;">Medium</span></td>
+                    </tr>
+                    <tr>
+                        <td>Interest Revenue</td>
+                        <td>Average interest rate accounts for 8.2% of portfolio</td>
+                        <td>Positive</td>
+                        <td>Maintain competitive rates while managing risk</td>
+                        <td><span style="background: #d4f4dd; padding: 4px 8px; border-radius: 3px; color: #27ae60;">Low</span></td>
+                    </tr>
+                    <tr>
+                        <td>Customer Retention</td>
+                        <td>Repeat borrower rate at 67%, industry avg 58%</td>
+                        <td>Positive</td>
+                        <td>Expand loyalty programs and customer benefits</td>
+                        <td><span style="background: #d4f4dd; padding: 4px 8px; border-radius: 3px; color: #27ae60;">Low</span></td>
+                    </tr>
+                    <tr>
+                        <td>Risk Concentration</td>
+                        <td>Top 10 borrowers represent 22% of portfolio</td>
+                        <td>Moderate</td>
+                        <td>Implement concentration limits and diversification strategy</td>
+                        <td><span style="background: #fff3cd; padding: 4px 8px; border-radius: 3px; color: #856404;">Medium</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // Loan Approval Trend
+        const approvalCtx = document.getElementById('approvalChart').getContext('2d');
+        new Chart(approvalCtx, {
+            type: 'line',
+            data: {
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                datasets: [{
+                    label: 'Approved Loans',
+                    data: [145, 168, 192, 210, 225, 245],
+                    borderColor: '#667eea',
+                    backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                    tension: 0.4,
+                    fill: true,
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: true } }
+            }
+        });
+
+        // Revenue by Loan Type
+        const revenueCtx = document.getElementById('revenueChart').getContext('2d');
+        new Chart(revenueCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Personal Loans', 'Business Loans', 'Auto Loans', 'Home Loans'],
+                datasets: [{
+                    data: [35, 28, 22, 15],
+                    backgroundColor: ['#667eea', '#764ba2', '#f39c12', '#27ae60']
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { position: 'bottom' } }
+            }
+        });
+
+        // Portfolio Quality
+        const qualityCtx = document.getElementById('qualityChart').getContext('2d');
+        new Chart(qualityCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Excellent', 'Good', 'Fair', 'Poor'],
+                datasets: [{
+                    label: 'Credit Distribution (%)',
+                    data: [42, 35, 18, 5],
+                    backgroundColor: ['#27ae60', '#f39c12', '#e67e22', '#e74c3c']
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } }
+            }
+        });
+
+        // Customer Satisfaction
+        const satisfactionCtx = document.getElementById('satisfactionChart').getContext('2d');
+        new Chart(satisfactionCtx, {
+            type: 'radar',
+            data: {
+                labels: ['Service Quality', 'Approval Speed', 'Interest Rates', 'Customer Support', 'Mobile App'],
+                datasets: [{
+                    label: 'Our Rating',
+                    data: [85, 88, 72, 90, 82],
+                    borderColor: '#667eea',
+                    backgroundColor: 'rgba(102, 126, 234, 0.2)'
+                }, {
+                    label: 'Industry Avg',
+                    data: [75, 78, 70, 80, 75],
+                    borderColor: '#ddd'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: true } }
+            }
+        });
+    </script>
+    <script src="js/app.js" defer></script>
+</body>
+</html>
