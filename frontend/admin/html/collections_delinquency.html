@@ -374,21 +374,11 @@
             }
         }
     </style>
+        <script src="navigations.js"></script>
 </head>
 <body data-page="collections">
     <div class="container">
-        <!-- Header -->
-        <header>
-            <h1>📊 Collections & Delinquency Tracker</h1>
-            <div class="nav-menu">
-                <a href="admin_dashboard.html" class="nav-btn">Dashboard</a>
-                <a href="application_review_queue.html" class="nav-btn">Applications</a>
-                <a href="user_management.html" class="nav-btn">Users</a>
-                <a href="loan_portfolio.html" class="nav-btn">Portfolio</a>
-                <a href="reports_analysis.html" class="nav-btn">Reports</a>
-                <a href="settings.html" class="nav-btn">Settings</a>
-            </div>
-        </header>
+ 
 
         <!-- Alert Banner -->
         <div class="alert-banner">
@@ -401,25 +391,25 @@
             <div class="metric-card">
                 <div class="metric-icon">💵</div>
                 <div class="metric-label">Collections This Month</div>
-                <div id="collectionsThisMonth" class="metric-value">$185,450</div>
+                <div class="metric-value">$185,450</div>
                 <div class="metric-sublabel">+15% vs last month</div>
             </div>
             <div class="metric-card warning">
                 <div class="metric-icon">⏰</div>
                 <div class="metric-label">Total Overdue Amount</div>
-                <div id="totalOverdue" class="metric-value">$156,200</div>
+                <div class="metric-value">$156,200</div>
                 <div class="metric-sublabel">214 overdue accounts</div>
             </div>
             <div class="metric-card danger">
                 <div class="metric-icon">🚨</div>
                 <div class="metric-label">90+ Days Delinquent</div>
-                <div id="daysDelinquent90" class="metric-value">$42,800</div>
+                <div class="metric-value">$42,800</div>
                 <div class="metric-sublabel">48 accounts at risk</div>
             </div>
             <div class="metric-card">
                 <div class="metric-icon">✅</div>
                 <div class="metric-label">Collection Rate</div>
-                <div id="collectionRate" class="metric-value">94.2%</div>
+                <div class="metric-value">94.2%</div>
                 <div class="metric-sublabel">On target for 2026</div>
             </div>
         </div>
